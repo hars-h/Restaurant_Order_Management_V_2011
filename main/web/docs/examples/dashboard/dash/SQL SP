@@ -1,0 +1,30 @@
+DELIMITER $$
+create procedure eod() 
+BEGIN
+
+IF CURTIME()<'04:00:00' THEN
+
+insert into order_dtl(TR_ID,T_ID,ITEM_ID,ITM_DESC,QTY,PRICE,FG,O_DT,DT)
+select TR_ID,T_ID,ITEM_ID,ITM_DESC,QTY,PRICE,FG,O_DT, SUBDATE(CURDATE(),1) from day_order_dtl;
+
+
+insert into order_hdr(TR_ID,T_ID,USR,CIN,CINF,CO,COF,BILL,SC,VAT_N_AL,VAT_AL,ST,TOTAL_BILL,DT)
+select TR_ID,T_ID,USR,CIN,CINF,CO,COF,BILL,SC,VAT_N_AL,VAT_AL,ST,TOTAL_BILL, SUBDATE(CURDATE(),1) from day_order_hdr;
+
+ELSE
+
+insert into order_dtl(TR_ID,T_ID,ITEM_ID,ITM_DESC,QTY,PRICE,FG,O_DT,DT)
+select TR_ID,T_ID,ITEM_ID,ITM_DESC,QTY,PRICE,FG,O_DT,CURDATE() from day_order_dtl;
+
+
+insert into order_hdr(TR_ID,T_ID,USR,CIN,CINF,CO,COF,BILL,SC,VAT_N_AL,VAT_AL,ST,TOTAL_BILL,DT)
+select TR_ID,T_ID,USR,CIN,CINF,CO,COF,BILL,SC,VAT_N_AL,VAT_AL,ST,TOTAL_BILL, CURDATE() from day_order_hdr;
+
+END IF;
+
+
+
+truncate table day_order_hdr;
+truncate table day_order_dtl;
+
+END $$
